@@ -18,34 +18,31 @@
  * limitations under the License.
  */
 
-#include <iterator>
-
+#include "flow/ActorCollection.h"
+#include "fdbrpc/PerfMetric.h"
+#include "flow/Trace.h"
+#include "fdbrpc/FailureMonitor.h"
 #include "fdbclient/NativeAPI.actor.h"
 #include "fdbclient/Notified.h"
 #include "fdbclient/SystemData.h"
-#include "fdbrpc/FailureMonitor.h"
-#include "fdbrpc/PerfMetric.h"
-#include "fdbrpc/sim_validation.h"
-#include "fdbserver/ApplyMetadataMutation.h"
-#include "fdbserver/BackupProgress.actor.h"
 #include "fdbserver/ConflictSet.h"
-#include "fdbserver/CoordinatedState.h"
-#include "fdbserver/CoordinationInterface.h"  // copy constructors for ServerCoordinators class
-#include "fdbserver/DBCoreState.h"
 #include "fdbserver/DataDistribution.actor.h"
-#include "fdbserver/IKeyValueStore.h"
 #include "fdbserver/Knobs.h"
-#include "fdbserver/LogSystem.h"
-#include "fdbserver/LogSystemDiskQueueAdapter.h"
+#include <iterator>
+#include "fdbserver/BackupProgress.actor.h"
 #include "fdbserver/MasterInterface.h"
-#include "fdbserver/ProxyCommitData.actor.h"
-#include "fdbserver/RecoveryState.h"
-#include "fdbserver/ServerDBInfo.h"
 #include "fdbserver/WaitFailure.h"
 #include "fdbserver/WorkerInterface.actor.h"
-#include "flow/ActorCollection.h"
-#include "flow/Trace.h"
-
+#include "fdbserver/ServerDBInfo.h"
+#include "fdbserver/CoordinatedState.h"
+#include "fdbserver/CoordinationInterface.h"  // copy constructors for ServerCoordinators class
+#include "fdbrpc/sim_validation.h"
+#include "fdbserver/DBCoreState.h"
+#include "fdbserver/LogSystem.h"
+#include "fdbserver/LogSystemDiskQueueAdapter.h"
+#include "fdbserver/IKeyValueStore.h"
+#include "fdbserver/ApplyMetadataMutation.h"
+#include "fdbserver/RecoveryState.h"
 #include "flow/actorcompiler.h"  // This must be the last #include.
 
 using std::vector;
@@ -1564,8 +1561,7 @@ ACTOR Future<Void> masterCore( Reference<MasterData> self ) {
 		}
 	}
 
-	applyMetadataMutations(self->dbgid, recoveryCommitRequest.arena, tr.mutations.slice(mmApplied, tr.mutations.size()),
-	                       self->txnStateStore);
+	applyMetadataMutations(self->dbgid, recoveryCommitRequest.arena, tr.mutations.slice(mmApplied, tr.mutations.size()), self->txnStateStore, nullptr, nullptr);
 	mmApplied = tr.mutations.size();
 
 	tr.read_snapshot = self->recoveryTransactionVersion;  // lastEpochEnd would make more sense, but isn't in the initial window of the resolver(s)
