@@ -255,7 +255,7 @@ else()
   target_link_libraries(fdbserver PRIVATE fdbclient fdb_sqlite)
 endif()
 
-add_dependencies(fdbserver toml11)
+#add_dependencies(fdbserver toml11)
 target_include_directories(fdbserver PRIVATE ${TOML11_INCLUDE_DIR})
 
 if (GPERFTOOLS_FOUND)
